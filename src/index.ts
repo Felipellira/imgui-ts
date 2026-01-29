@@ -4,7 +4,7 @@ import * as ImGui_Impl from "./imgui_impl"
 
 export {ImGui, ImGui_Impl, ImVec4}
 
-export const version="0.1.50";
+export const version="0.1.51";
 
 export const ImGuiTableFlagsDefault= 
     ImGui.ImGuiTableFlags.RowBg|
@@ -82,7 +82,11 @@ export function ImGuiObject(obj:any, id:number=0):number
         else if(typeof(value)==='number')    {
             let v=(_:number=value as number):number=>obj[key]=_;
             ImGui.SetNextItemWidth(100);
-            ImGui.InputFloat(key_str, v);
+            if(Number.isInteger(value)) {
+                ImGui.InputInt(key_str, v);
+            }else {
+                ImGui.InputDouble(key_str, v);
+            }
         }
         else if(typeof(value)==='boolean')    {
             let v=(_:boolean=value as boolean):boolean=>obj[key]=_;
