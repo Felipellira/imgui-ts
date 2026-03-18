@@ -747,9 +747,9 @@ function BlendFactor(v:number, src:boolean):GLenum
 export function RenderDrawData(draw_data: ImGui.DrawData | null = ImGui.GetDrawData()): void {
     const io = ImGui.GetIO();
 
-    font_update(io);
-    scroll_update(io);    
-    input_text_update(io);
+    // font_update removed — native ImGui font atlas handles glyph rasterization
+    scroll_update(io);
+    // input_text_update removed — canvas keypress + AddInputCharacter handles text input
 
     if (draw_data === null) { throw new Error(); }
 

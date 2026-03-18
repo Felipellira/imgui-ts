@@ -2426,26 +2426,10 @@ export class ImFont
 {
     constructor(public readonly native: Bind.reference_ImFont) {}
 
-    public setFont(config:DOMFontConfig):void {
-        this.native.FontName=config.name;
-        this.native.FontSize=config.fontsize;
-        this.native.Ascent=config.ascent?config.ascent:0;
-        this.native.Descent=config.descent?config.descent:0;
-    }
-
     // Members: Hot ~62/78 bytes
     // float                       FontSize;           // <user set>   // Height of characters, set during loading (don't change after loading)
-    get FontStyle(): string { return this.native.FontStyle; }
-    set FontStyle(v:string) {this.native.FontStyle=v;}
-
-    get FontName(): string { return this.native.FontName; }
-    set FontName(v:string) {this.native.FontName=v;}
-
     get FontSize(): number { return this.native.FontSize; }
     set FontSize(v:number) {this.native.FontSize=v;}
-
-    get SpaceX():number[] {return [this.native.SpaceX0, this.native.SpaceX1];}
-    set SpaceX(v:number[]) {this.native.SpaceX0=v[0]; this.native.SpaceX1=v[1];}
 
     // float                       Scale;              // = 1.f        // Base font scale, multiplied by the per-window font scale which you can adjust with SetFontScale()
     get Scale(): number { return this.native.Scale; }
@@ -2459,25 +2443,6 @@ export class ImFont
         return glyphs;
     }
     // ImVector<float>             IndexAdvanceX;      //              // Sparse. Glyphs->AdvanceX in a directly indexable way (more cache-friendly, for CalcTextSize functions which are often bottleneck in large UI).
-    get IndexAdvanceX(): number[] { 
-        let a=[...Array(this.native.IndexAdvanceXSize)];
-        for(let i=0;i<this.native.IndexAdvanceXSize;i++) {
-            a[i]=this.GetAdvanceX(i);
-        }
-        return a;
-        //return new Float32Array(this.native.IndexAdvanceX.buffer,0,this.native.IndexAdvanceX.length/Float32Array.BYTES_PER_ELEMENT); 
-    }
-    //get IndexAdvanceX():Uint8Array {return this.native.IndexAdvanceX;}
-    get IndexAdvanceXSize():number {return this.native.IndexAdvanceXSize;}
-
-    get NotReadyChar():number[] {
-        let a=[...Array(this.native.NotReadyCharSize)];
-        for(let i=0;i<this.native.NotReadyCharSize;i++) {
-            a[i]=this.GetNotReadyChar(i);
-        }
-        return a;
-    }
-    get NotReadyCharSize():number {return this.native.NotReadyCharSize;}
     // ImVector<unsigned short>    IndexLookup;        //              // Sparse. Index glyphs by Unicode code-point.
     // get IndexLookup(): any { return this.native.IndexLookup; }
     // const ImFontGlyph*          FallbackGlyph;      // == FindGlyph(FontFallbackChar)
@@ -2569,49 +2534,6 @@ export class ImFont
     // IMGUI_API bool              IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last);
     public IsGlyphRangeUnused(c_begin: number, c_last: number): boolean { return false; } // TODO
 
-    get GlyphToCreate():ImFontGlyph {
-        let glyph=this.native.GlyphToCreate();
-        return glyph?new ImFontGlyph(glyph):null;
-    }
-
-    get IterateGlyphToCreate():ImFontGlyph[] {
-        const glyphs: ImFontGlyph[] = [];
-        this.native.IterateGlyphToCreate((glyph: Bind.reference_ImFontGlyph): void => {
-            glyphs.push(new ImFontGlyph(glyph));
-        });
-        return glyphs;
-    } 
-    public GlyphCreated(glyph:ImFontGlyph) {
-        this.native.GlyphCreated(glyph.internal);
-    }
-    public ClearGlyphCreated() {
-        this.native.ClearGlyphCreated();
-    }
-
-    public CreateGlyph(text: string) {
-        this.native.CreateGlyph(text);
-    }
-    AddFontRange(start:number, end:number) {
-        this.native.AddFontRange(start, end);
-    }
-    ClearFontRange() {
-        this.native.ClearFontRange();
-    }
-    MergeFont(font:ImFont) {
-        this.native.MergeFont(font.native);
-    }
-    ClearSubFont() {
-        this.native.ClearSubFont();
-    }
-    InRange(c:number):boolean {
-        return this.native.InRange(c);
-    }
-    GetAdvanceX(c:number):number {
-        return this.native.GetAdvanceX(c);
-    }
-    GetNotReadyChar(i:number):number {
-        return this.native.GetNotReadyChar(i);
-    }
 }
 
 // a script version of Bind.ImGuiStyle with matching interface
@@ -4946,7 +4868,7 @@ export function GetActiveIdPreviousFrame():ImGuiID {return bind.GetActiveIdPrevi
 export function SetActiveId(id:ImGuiID) {return bind.SetActiveId(id);}
 
 export function GetInputTextState(id:ImGuiID): ImGuiInputTextState { return new ImGuiInputTextState(bind.GetInputTextState(id)); }
-export function GetInputTextId():ImGuiID {return bind.GetInputTextId();}
+// GetInputTextId removed — internal API changed in ImGui 1.91.6
 
 export function Vec4_toRGBA(col:ImVec4):string
 {
