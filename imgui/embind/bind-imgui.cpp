@@ -2503,7 +2503,7 @@ EMSCRIPTEN_BINDINGS(ImGui) {
             if (0 <= idx && idx < ctx->_ImGui_Combo_items_count) {
                 ctx->_ImGui_Combo_text = "";
                 emscripten::val _out_text = emscripten::val::array();
-                _out_text[0] = emscripten::val(ctx->_ImGui_Combo_text);
+                _out_text.set(0, emscripten::val(ctx->_ImGui_Combo_text));
                 emscripten::val ret = ctx->_ImGui_Combo_items_getter(ctx->_ImGui_Combo_data, emscripten::val(idx), _out_text);
                 ctx->_ImGui_Combo_text = _out_text[0].as<std::string>();
                 *out_text = ctx->_ImGui_Combo_text.c_str();
@@ -2908,7 +2908,7 @@ EMSCRIPTEN_BINDINGS(ImGui) {
             if (0 <= idx && idx <= ctx->_ImGui_ListBox_B_items_count) {
                 ctx->_ImGui_ListBox_B_text = "";
                 emscripten::val _out_text = emscripten::val::array();
-                _out_text[0] = emscripten::val(ctx->_ImGui_ListBox_B_text);
+                _out_text.set(0, emscripten::val(ctx->_ImGui_ListBox_B_text));
                 emscripten::val ret = ctx->_ImGui_ListBox_B_items_getter(ctx->_ImGui_ListBox_B_data, emscripten::val(idx), _out_text);
                 ctx->_ImGui_ListBox_B_text = _out_text[0].as<std::string>();
                 *out_text = ctx->_ImGui_ListBox_B_text.c_str();
@@ -3465,3 +3465,210 @@ EMSCRIPTEN_BINDINGS(ImGuiWindow) {
     emscripten::function("GetInputTextId", FUNCTION(emscripten::val, (), { return emscripten::val(ImGui::GetCurrentContext()->InputTextState.ID); }));
 }
 
+
+// ── ImGuizmo bindings ──────────────────────────────────────────
+
+#include "ImGuizmo.h"
+
+EMSCRIPTEN_BINDINGS(ImGuizmo) {
+
+    emscripten::enum_<ImGuizmo::OPERATION>("ImGuizmoOperation")
+        .value("TRANSLATE_X", ImGuizmo::TRANSLATE_X)
+        .value("TRANSLATE_Y", ImGuizmo::TRANSLATE_Y)
+        .value("TRANSLATE_Z", ImGuizmo::TRANSLATE_Z)
+        .value("ROTATE_X", ImGuizmo::ROTATE_X)
+        .value("ROTATE_Y", ImGuizmo::ROTATE_Y)
+        .value("ROTATE_Z", ImGuizmo::ROTATE_Z)
+        .value("ROTATE_SCREEN", ImGuizmo::ROTATE_SCREEN)
+        .value("SCALE_X", ImGuizmo::SCALE_X)
+        .value("SCALE_Y", ImGuizmo::SCALE_Y)
+        .value("SCALE_Z", ImGuizmo::SCALE_Z)
+        .value("BOUNDS", ImGuizmo::BOUNDS)
+        .value("SCALE_XU", ImGuizmo::SCALE_XU)
+        .value("SCALE_YU", ImGuizmo::SCALE_YU)
+        .value("SCALE_ZU", ImGuizmo::SCALE_ZU)
+        .value("TRANSLATE", ImGuizmo::TRANSLATE)
+        .value("ROTATE", ImGuizmo::ROTATE)
+        .value("SCALE", ImGuizmo::SCALE)
+        .value("SCALEU", ImGuizmo::SCALEU)
+        .value("UNIVERSAL", ImGuizmo::UNIVERSAL)
+        ;
+
+    emscripten::enum_<ImGuizmo::MODE>("ImGuizmoMode")
+        .value("LOCAL", ImGuizmo::LOCAL)
+        .value("WORLD", ImGuizmo::WORLD)
+        ;
+
+    emscripten::enum_<ImGuizmo::COLOR>("ImGuizmoColor")
+        .value("DIRECTION_X", ImGuizmo::DIRECTION_X)
+        .value("DIRECTION_Y", ImGuizmo::DIRECTION_Y)
+        .value("DIRECTION_Z", ImGuizmo::DIRECTION_Z)
+        .value("PLANE_X", ImGuizmo::PLANE_X)
+        .value("PLANE_Y", ImGuizmo::PLANE_Y)
+        .value("PLANE_Z", ImGuizmo::PLANE_Z)
+        .value("SELECTION", ImGuizmo::SELECTION)
+        .value("INACTIVE", ImGuizmo::INACTIVE)
+        .value("TRANSLATION_LINE", ImGuizmo::TRANSLATION_LINE)
+        .value("SCALE_LINE", ImGuizmo::SCALE_LINE)
+        .value("ROTATION_USING_BORDER", ImGuizmo::ROTATION_USING_BORDER)
+        .value("ROTATION_USING_FILL", ImGuizmo::ROTATION_USING_FILL)
+        .value("HATCHED_AXIS_LINES", ImGuizmo::HATCHED_AXIS_LINES)
+        .value("TEXT", ImGuizmo::TEXT)
+        .value("TEXT_SHADOW", ImGuizmo::TEXT_SHADOW)
+        ;
+
+    emscripten::function("ImGuizmo_SetDrawlist", FUNCTION(void, (), {
+        ImGuizmo::SetDrawlist();
+    }));
+
+    emscripten::function("ImGuizmo_BeginFrame", &ImGuizmo::BeginFrame);
+    emscripten::function("ImGuizmo_IsOver", FUNCTION(bool, (), { return ImGuizmo::IsOver(); }));
+    emscripten::function("ImGuizmo_IsUsing", &ImGuizmo::IsUsing);
+    emscripten::function("ImGuizmo_IsUsingAny", &ImGuizmo::IsUsingAny);
+    emscripten::function("ImGuizmo_Enable", &ImGuizmo::Enable);
+    emscripten::function("ImGuizmo_SetOrthographic", &ImGuizmo::SetOrthographic);
+    emscripten::function("ImGuizmo_SetGizmoSizeClipSpace", &ImGuizmo::SetGizmoSizeClipSpace);
+    emscripten::function("ImGuizmo_AllowAxisFlip", &ImGuizmo::AllowAxisFlip);
+    emscripten::function("ImGuizmo_SetAxisLimit", &ImGuizmo::SetAxisLimit);
+    emscripten::function("ImGuizmo_SetPlaneLimit", &ImGuizmo::SetPlaneLimit);
+
+    emscripten::function("ImGuizmo_SetRect", &ImGuizmo::SetRect);
+
+    // Manipulate: takes typed arrays, returns bool (matrix modified)
+    emscripten::function("ImGuizmo_Manipulate", FUNCTION(bool, (
+        emscripten::val view_val,
+        emscripten::val proj_val,
+        ImGuizmo::OPERATION op,
+        ImGuizmo::MODE mode,
+        emscripten::val matrix_val,
+        emscripten::val delta_val,
+        emscripten::val snap_val
+    ), {
+        // View matrix (16 floats, read-only)
+        std::vector<float> view_vec = emscripten::vecFromJSArray<float>(view_val);
+        // Projection matrix (16 floats, read-only)
+        std::vector<float> proj_vec = emscripten::vecFromJSArray<float>(proj_val);
+        // Object matrix (16 floats, read-write)
+        std::vector<float> matrix_vec = emscripten::vecFromJSArray<float>(matrix_val);
+
+        float* snap_ptr = nullptr;
+        std::vector<float> snap_vec;
+        if (!snap_val.isNull() && !snap_val.isUndefined()) {
+            snap_vec = emscripten::vecFromJSArray<float>(snap_val);
+            snap_ptr = snap_vec.data();
+        }
+
+        float delta[16];
+        bool result = ImGuizmo::Manipulate(
+            view_vec.data(), proj_vec.data(),
+            op, mode,
+            matrix_vec.data(),
+            delta,
+            snap_ptr
+        );
+
+        // Write back modified matrix
+        if (result) {
+            for (int i = 0; i < 16; i++) {
+                matrix_val.set(i, matrix_vec[i]);
+            }
+            if (!delta_val.isNull() && !delta_val.isUndefined()) {
+                for (int i = 0; i < 16; i++) {
+                    delta_val.set(i, delta[i]);
+                }
+            }
+        }
+
+        return result;
+    }));
+
+    // DecomposeMatrixToComponents
+    emscripten::function("ImGuizmo_DecomposeMatrixToComponents", FUNCTION(emscripten::val, (
+        emscripten::val matrix_val
+    ), {
+        std::vector<float> matrix_vec = emscripten::vecFromJSArray<float>(matrix_val);
+        float translation[3], rotation[3], scale[3];
+        ImGuizmo::DecomposeMatrixToComponents(matrix_vec.data(), translation, rotation, scale);
+
+        emscripten::val result = emscripten::val::object();
+        emscripten::val t = emscripten::val::array();
+        emscripten::val r = emscripten::val::array();
+        emscripten::val s = emscripten::val::array();
+        for (int i = 0; i < 3; i++) {
+            t.set(i, translation[i]);
+            r.set(i, rotation[i]);
+            s.set(i, scale[i]);
+        }
+        result.set("translation", t);
+        result.set("rotation", r);
+        result.set("scale", s);
+        return result;
+    }));
+
+    // RecomposeMatrixFromComponents
+    emscripten::function("ImGuizmo_RecomposeMatrixFromComponents", FUNCTION(emscripten::val, (
+        emscripten::val translation_val,
+        emscripten::val rotation_val,
+        emscripten::val scale_val
+    ), {
+        std::vector<float> t = emscripten::vecFromJSArray<float>(translation_val);
+        std::vector<float> r = emscripten::vecFromJSArray<float>(rotation_val);
+        std::vector<float> s = emscripten::vecFromJSArray<float>(scale_val);
+        float matrix[16];
+        ImGuizmo::RecomposeMatrixFromComponents(t.data(), r.data(), s.data(), matrix);
+
+        emscripten::val result = emscripten::val::array();
+        for (int i = 0; i < 16; i++) {
+            result.set(i, matrix[i]);
+        }
+        return result;
+    }));
+
+    // DrawCubes
+    emscripten::function("ImGuizmo_DrawCubes", FUNCTION(void, (
+        emscripten::val view_val,
+        emscripten::val proj_val,
+        emscripten::val matrices_val,
+        int count
+    ), {
+        std::vector<float> view_vec = emscripten::vecFromJSArray<float>(view_val);
+        std::vector<float> proj_vec = emscripten::vecFromJSArray<float>(proj_val);
+        std::vector<float> matrices_vec = emscripten::vecFromJSArray<float>(matrices_val);
+        ImGuizmo::DrawCubes(view_vec.data(), proj_vec.data(), matrices_vec.data(), count);
+    }));
+
+    // DrawGrid
+    emscripten::function("ImGuizmo_DrawGrid", FUNCTION(void, (
+        emscripten::val view_val,
+        emscripten::val proj_val,
+        emscripten::val matrix_val,
+        float gridSize
+    ), {
+        std::vector<float> view_vec = emscripten::vecFromJSArray<float>(view_val);
+        std::vector<float> proj_vec = emscripten::vecFromJSArray<float>(proj_val);
+        std::vector<float> matrix_vec = emscripten::vecFromJSArray<float>(matrix_val);
+        ImGuizmo::DrawGrid(view_vec.data(), proj_vec.data(), matrix_vec.data(), gridSize);
+    }));
+
+    // ViewManipulate
+    emscripten::function("ImGuizmo_ViewManipulate", FUNCTION(void, (
+        emscripten::val view_val,
+        float length,
+        float posX, float posY,
+        float sizeX, float sizeY,
+        unsigned int bgColor
+    ), {
+        std::vector<float> view_vec = emscripten::vecFromJSArray<float>(view_val);
+        ImGuizmo::ViewManipulate(view_vec.data(), length, ImVec2(posX, posY), ImVec2(sizeX, sizeY), bgColor);
+        // Write back modified view matrix
+        for (int i = 0; i < 16; i++) {
+            view_val.set(i, view_vec[i]);
+        }
+    }));
+
+    // PushID / PopID
+    emscripten::function("ImGuizmo_PushID", FUNCTION(void, (int id), {
+        ImGuizmo::PushID(id);
+    }));
+    emscripten::function("ImGuizmo_PopID", &ImGuizmo::PopID);
+}
