@@ -2813,14 +2813,14 @@ export class ImGuiIO
     // float         MouseDragThreshold;       // = 6.0f               // Distance threshold before considering we are dragging
     get MouseDragThreshold(): number { return this.native.MouseDragThreshold; }
     set MouseDragThreshold(value: number) { this.native.MouseDragThreshold = value; }
-    // int           KeyMap[ImGuiKey_COUNT];   // <unset>              // Map of indices into the KeysDown[512] entries array
+    // KeyMap removed in ImGui 1.91.6 — keys are now directly mapped
     public KeyMap: number[] = new Proxy([], {
-        get: (target: number[], key: PropertyKey): number => {
+        get: (_target: number[], key: PropertyKey): number => {
             if (key === "length") { return ImGuiKey.COUNT; }
-            return this.native._getAt_KeyMap(Number(key));
+            return Number(key);
         },
-        set: (target: number[], key: PropertyKey, value: number): boolean => {
-            return this.native._setAt_KeyMap(Number(key), value);
+        set: (_target: number[], _key: PropertyKey, _value: number): boolean => {
+            return true;
         },
     });
     // float         KeyRepeatDelay;           // = 0.250f             // When holding a key/button, time before it starts repeating, in seconds (for buttons in Repeat mode, etc.).
@@ -2838,9 +2838,9 @@ export class ImGuiIO
     // float         FontGlobalScale;          // = 1.0f               // Global scale all fonts
     get FontGlobalScale(): number { return this.native.FontGlobalScale; }
     set FontGlobalScale(value: number) { this.native.FontGlobalScale = value; }
-    // bool          FontAllowUserScaling;     // = false              // Allow user scaling text of individual window with CTRL+Wheel.
-    get FontAllowUserScaling(): boolean { return this.native.FontAllowUserScaling; }
-    set FontAllowUserScaling(value: boolean) { this.native.FontAllowUserScaling = value; }
+    // FontAllowUserScaling removed in ImGui 1.91.6
+    get FontAllowUserScaling(): boolean { return false; }
+    set FontAllowUserScaling(_value: boolean) { }
     // ImFont*       FontDefault;              // = NULL               // Font to use on NewFrame(). Use NULL to uses Fonts->Fonts[0].
     get FontDefault(): ImFont | null {
         const font: Bind.reference_ImFont | null = this.native.FontDefault;
@@ -2854,14 +2854,14 @@ export class ImGuiIO
 
     // Miscellaneous configuration options
     // bool          OptMacOSXBehaviors;       // = defined(__APPLE__) // OS X style: Text editing cursor movement using Alt instead of Ctrl, Shortcuts using Cmd/Super instead of Ctrl, Line/Text Start and End using Cmd+Arrows instead of Home/End, Double click selects by word instead of selecting whole text, Multi-selection in lists uses Cmd/Super instead of Ctrl
-    get ConfigMacOSXBehaviors(): boolean { return this.native.ConfigMacOSXBehaviors; }
-    set ConfigMacOSXBehaviors(value: boolean) { this.native.ConfigMacOSXBehaviors = value; }
+    get ConfigMacOSXBehaviors(): boolean { return false; }
+    set ConfigMacOSXBehaviors(_value: boolean) { }
     // bool          ConfigInputTextCursorBlink;   // = true               // Enable blinking cursor, for users who consider it annoying.
     get ConfigInputTextCursorBlink(): boolean { return this.native.ConfigInputTextCursorBlink; }
     set ConfigInputTextCursorBlink(value: boolean) { this.native.ConfigInputTextCursorBlink = value; }
     // bool        ConfigDragClickToInputText;     // = false          // [BETA] Enable turning DragXXX widgets into text input with a simple mouse click-release (without moving). Not desirable on devices without a keyboard.
-    get ConfigDragClickToInputText(): boolean { return this.native.ConfigDragClickToInputText; }
-    set ConfigDragClickToInputText(value: boolean) { this.native.ConfigDragClickToInputText = value; }
+    get ConfigDragClickToInputText(): boolean { return false; }
+    set ConfigDragClickToInputText(_value: boolean) { }
     // bool          ConfigWindowsResizeFromEdges; // = false          // [BETA] Enable resizing of windows from their edges and from the lower-left corner. This requires (io.BackendFlags & ImGuiBackendFlags_HasMouseCursors) because it needs mouse cursor feedback. (This used to be the ImGuiWindowFlags_ResizeFromAnySide flag)
     get ConfigWindowsResizeFromEdges(): boolean { return this.native.ConfigWindowsResizeFromEdges; }
     set ConfigWindowsResizeFromEdges(value: boolean) { this.native.ConfigWindowsResizeFromEdges = value; }
@@ -2947,24 +2947,23 @@ export class ImGuiIO
     get KeyAlt(): boolean { return this.native.KeyAlt; } set KeyAlt(value: boolean) { this.native.KeyAlt = value; }
     // bool        KeySuper;                   // Keyboard modifier pressed: Cmd/Super/Windows
     get KeySuper(): boolean { return this.native.KeySuper; } set KeySuper(value: boolean) { this.native.KeySuper = value; }
-    // bool        KeysDown[512];              // Keyboard keys that are pressed (in whatever storage order you naturally have access to keyboard data)
+    // KeysDown/NavInputs removed in ImGui 1.91.6 — use AddKeyEvent/AddKeyAnalogEvent
     public KeysDown: boolean[] = new Proxy([], {
-        get: (target: boolean[], key: PropertyKey): number | boolean => {
+        get: (_target: boolean[], key: PropertyKey): number | boolean => {
             if (key === "length") { return 512; }
-            return this.native._getAt_KeysDown(Number(key));
+            return false;
         },
-        set: (target: boolean[], key: PropertyKey, value: boolean): boolean => {
-            return this.native._setAt_KeysDown(Number(key), value);
+        set: (_target: boolean[], _key: PropertyKey, _value: boolean): boolean => {
+            return true;
         },
     });
-    // float       NavInputs[ImGuiNavInput_COUNT]; // Gamepad inputs (keyboard keys will be auto-mapped and be written here by ImGui::NewFrame)
     public NavInputs: number[] = new Proxy([], {
-        get: (target: number[], key: PropertyKey): number => {
+        get: (_target: number[], key: PropertyKey): number => {
             if (key === "length") { return ImGuiNavInput.COUNT; }
-            return this.native._getAt_NavInputs(Number(key));
+            return 0;
         },
-        set: (target: number[], key: PropertyKey, value: number): boolean => {
-            return this.native._setAt_NavInputs(Number(key), value);
+        set: (_target: number[], _key: PropertyKey, _value: number): boolean => {
+            return true;
         },
     });
 
@@ -3007,7 +3006,7 @@ export class ImGuiIO
     // int         MetricsActiveWindows;       // Number of visible root windows (exclude child windows)
     get MetricsActiveWindows(): number { return this.native.MetricsActiveWindows; }
     // int         MetricsActiveAllocations;   // Number of active allocations, updated by MemAlloc/MemFree based on current context. May be off if you have multiple imgui contexts.
-    get MetricsActiveAllocations(): number { return this.native.MetricsActiveAllocations; }
+    get MetricsActiveAllocations(): number { return 0; }
     // ImVec2      MouseDelta;                 // Mouse delta. Note that this is zero if either current or previous position are invalid (-FLT_MAX,-FLT_MAX), so a disappearing/reappearing mouse won't have a huge delta.
     get MouseDelta(): Readonly<Bind.reference_ImVec2> { return this.native.MouseDelta; }
 
@@ -3039,19 +3038,17 @@ export class ImGuiIO
     // float       MouseDownDurationPrev[5];   // Previous time the mouse button has been down
     // ImVec2      MouseDragMaxDistanceAbs[5]; // Maximum distance, absolute, on each axis, of how much mouse has traveled from the clicking point
     // float       MouseDragMaxDistanceSqr[5]; // Squared maximum distance of how much mouse has traveled from the clicking point
-    // float       KeysDownDuration[512];      // Duration the keyboard key has been down (0.0f == just pressed)
+    // KeysDownDuration/NavInputsDownDuration removed in ImGui 1.91.6
     public KeysDownDuration: number[] = new Proxy([], {
-        get: (target: number[], key: PropertyKey): number => {
+        get: (_target: number[], key: PropertyKey): number => {
             if (key === "length") { return 512; }
-            return this.native._getAt_KeysDownDuration(Number(key));
+            return -1.0;
         },
     });
-    // float       KeysDownDurationPrev[512];  // Previous duration the key has been down
-    // float       NavInputsDownDuration[ImGuiNavInput_COUNT];
     public NavInputsDownDuration: number[] = new Proxy([], {
-        get: (target: number[], key: PropertyKey): number => {
+        get: (_target: number[], key: PropertyKey): number => {
             if (key === "length") { return ImGuiNavInput.COUNT; }
-            return this.native._getAt_NavInputsDownDuration(Number(key));
+            return -1.0;
         },
     });
     // float       NavInputsDownDurationPrev[ImGuiNavInput_COUNT];
