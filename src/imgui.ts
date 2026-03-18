@@ -119,9 +119,9 @@ export var isMobile = {
 //import * as config from "./imconfig";
 
 export { IMGUI_VERSION as VERSION }
-export const IMGUI_VERSION: string = "1.80"; // bind.IMGUI_VERSION;
+export const IMGUI_VERSION: string = "1.91.6"; // bind.IMGUI_VERSION;
 export { IMGUI_VERSION_NUM as VERSION_NUM }
-export const IMGUI_VERSION_NUM: number = 18000; // bind.IMGUI_VERSION_NUM;
+export const IMGUI_VERSION_NUM: number = 19160; // bind.IMGUI_VERSION_NUM;
 
 // #define IMGUI_CHECKVERSION()        ImGui::DebugCheckVersionAndDataLayout(IMGUI_VERSION, sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert))
 export { IMGUI_CHECKVERSION as CHECKVERSION }
