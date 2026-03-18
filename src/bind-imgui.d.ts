@@ -2153,4 +2153,48 @@ export interface Module extends Emscripten.EmscriptenModule {
     GetInputTextId():ImGuiID;
 
     ImTransform():reference_ImTransform;
+
+    // ── ImGuizmo bindings ──
+    ImGuizmo_BeginFrame(): void;
+    ImGuizmo_SetDrawlist(): void;
+    ImGuizmo_SetRect(x: number, y: number, width: number, height: number): void;
+    ImGuizmo_SetOrthographic(isOrthographic: boolean): void;
+    ImGuizmo_Enable(enable: boolean): void;
+    ImGuizmo_IsOver(): boolean;
+    ImGuizmo_IsUsing(): boolean;
+    ImGuizmo_IsUsingAny(): boolean;
+    ImGuizmo_SetGizmoSizeClipSpace(value: number): void;
+    ImGuizmo_AllowAxisFlip(value: boolean): void;
+    ImGuizmo_SetAxisLimit(value: number): void;
+    ImGuizmo_SetPlaneLimit(value: number): void;
+    ImGuizmo_Manipulate(
+        view: number[],
+        projection: number[],
+        operation: number,
+        mode: number,
+        matrix: number[],
+        deltaMatrix: number[] | null,
+        snap: number[] | null,
+    ): boolean;
+    ImGuizmo_DecomposeMatrixToComponents(matrix: number[]): {
+        translation: [number, number, number];
+        rotation: [number, number, number];
+        scale: [number, number, number];
+    };
+    ImGuizmo_RecomposeMatrixFromComponents(
+        translation: number[],
+        rotation: number[],
+        scale: number[],
+    ): number[];
+    ImGuizmo_DrawCubes(view: number[], projection: number[], matrices: number[], count: number): void;
+    ImGuizmo_DrawGrid(view: number[], projection: number[], matrix: number[], gridSize: number): void;
+    ImGuizmo_ViewManipulate(
+        view: number[],
+        length: number,
+        posX: number, posY: number,
+        sizeX: number, sizeY: number,
+        bgColor: number,
+    ): void;
+    ImGuizmo_PushID(id: number): void;
+    ImGuizmo_PopID(): void;
 }
