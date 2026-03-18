@@ -4875,8 +4875,20 @@ export function Vec4_toRGBA(col:ImVec4):string
 export function DockSpace(id: ImGuiID, size: Readonly<Bind.interface_ImVec2> = ImVec2.ZERO, flags: number = 0): ImGuiID {
     return bind.DockSpace(id, size, flags);
 }
-export function DockSpaceOverViewport(): ImGuiID {
-    return bind.DockSpaceOverViewport();
+export const ImGuiDockNodeFlags = {
+    None: 0,
+    KeepAliveOnly: 1 << 0,
+    NoDockingOverCentralNode: 1 << 2,
+    PassthruCentralNode: 1 << 3,
+    NoDockingSplit: 1 << 4,
+    NoResize: 1 << 5,
+    AutoHideTabBar: 1 << 6,
+    NoUndocking: 1 << 7,
+} as const;
+export { ImGuiDockNodeFlags as DockNodeFlags };
+
+export function DockSpaceOverViewport(flags: number = 0): ImGuiID {
+    return bind.DockSpaceOverViewport(flags);
 }
 export function SetNextWindowDockID(dock_id: ImGuiID, cond: ImGuiCond = 0): void {
     bind.SetNextWindowDockID(dock_id, cond);
