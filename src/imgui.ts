@@ -2056,8 +2056,8 @@ export class ImDrawData
     // IMGUI_API void DeIndexAllBuffers();               // For backward compatibility or convenience: convert all buffers from indexed to de-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
     public DeIndexAllBuffers(): void { this.native.DeIndexAllBuffers(); }
     // IMGUI_API void ScaleClipRects(const ImVec2& fb_scale);  // Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
-    public ScaleClipRects(fb_scale: Readonly<Bind.interface_ImVec2>): void {
-        this.native.ScaleClipRects(fb_scale);
+    public ScaleClipRects(_fb_scale: Readonly<Bind.interface_ImVec2>): void {
+        // Removed in ImGui 1.91.6 — clip rects are already scaled
     }
 }
 
