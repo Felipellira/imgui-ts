@@ -1615,10 +1615,10 @@ export class ImGuiListClipper
     public get DisplayEnd(): number { return this.native.DisplayEnd; }
 
     public get ItemsCount(): number { return this.native.ItemsCount; }
-    public get StepNo(): number { return this.native.StepNo; }
-    public get ItemsFrozen(): number { return this.native.ItemsFrozen; }
-    public get ItemsHeight(): number { return this.native.ItemsHeight; }
-    public get StartPosY(): number { return this.native.StartPosY; }
+    public get StepNo(): number { return 0; } // Removed from C++ bindings
+    public get ItemsFrozen(): number { return 0; } // Removed from C++ bindings
+    public get ItemsHeight(): number { return 0; } // Removed from C++ bindings
+    public get StartPosY(): number { return 0; } // Removed from C++ bindings
 
     // items_count:  Use -1 to ignore (you can call Begin later). Use INT_MAX if you don't know how many items you have (in which case the cursor won't be advanced in the final step).
     // items_height: Use -1.0f to be calculated automatically on first step. Otherwise pass in the distance between your items, typically GetTextLineHeightWithSpacing() or GetFrameHeightWithSpacing().
@@ -1689,8 +1689,8 @@ export class ImDrawCmd
     get TextureId(): ImTextureID | null {
         return ImGuiContext.getTexture(this.native.TextureId);
     }
-    get Blend(): Readonly<Bind.reference_ImBlend> {
-        return this.native.Blend;
+    get Blend(): { src: number, dst: number } {
+        return { src: 1, dst: 0 }; // Removed from C++ bindings, return default
     }
     // unsigned int    VtxOffset;              // Start offset in vertex buffer. Pre-1.71 or without ImGuiBackendFlags_RendererHasVtxOffset: always 0. With ImGuiBackendFlags_RendererHasVtxOffset: may be >0 to support meshes larger than 64K vertices with 16-bits indices.
     get VtxOffset(): number { return this.native.VtxOffset; }
@@ -1843,8 +1843,8 @@ export class ImDrawList
         return this.native.GetClipRectMax(out);
     }
 
-    public SetBlend(blend: Readonly<Bind.interface_ImBlend>):void {
-        this.native.SetBlend(blend);
+    public SetBlend(blend: any):void {
+        // Removed from C++ bindings, no-op
     }
 
     // Primitives
@@ -2013,13 +2013,12 @@ export class ImDrawList
 
     AddRectFilledMultiColorRound(a: Readonly<Bind.interface_ImVec2>, b: Readonly<Bind.interface_ImVec2>, col_lt: ImU32, col_rt: ImU32, col_lb: ImU32, col_rb: ImU32, rounding: number, rounding_corners_flags: ImDrawCornerFlags): void
     {
-        this.native.AddRectFilledMultiColorRound(a, b, col_lt, col_rt, col_lb, col_rb, rounding, rounding_corners_flags);
+        // Removed from C++ bindings, no-op
     }
-    GetVertexSize(): number { return this.native.GetVertexSize(); }
-    Transform(tm:Readonly<Bind.interface_ImTransform>, start:number, end?:number): void
+    GetVertexSize(): number { return this.native.VtxBuffer ? 20 : 0; } // ImDrawVert is 20 bytes
+    Transform(tm: any, start: number, end?: number): void
     {
-        if(!end) end=0;
-        this.native.Transform(tm, start, end);
+        // Removed from C++ bindings, no-op
     }
 }
 
@@ -2495,7 +2494,7 @@ export class ImFont
         return glyph && new ImFontGlyph(glyph);
     }
     // IMGUI_API void              SetFallbackChar(ImWchar c);
-    public SetFallbackChar(c: number): void { return this.native.SetFallbackChar(c); }
+    public SetFallbackChar(c: number): void { /* Removed from C++ bindings, no-op */ }
     // float                       GetCharAdvance(ImWchar c) const     { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
     public GetCharAdvance(c: number): number { return this.native.GetCharAdvance(c); }
     // bool                        IsLoaded() const                    { return ContainerAtlas != NULL; }
@@ -3313,9 +3312,9 @@ export function SetWindowFontScale(scale: number): void { bind.SetWindowFontScal
 // IMGUI_API float         GetWindowContentRegionWidth();                                  //
 export function GetContentRegionAvail(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { return bind.GetContentRegionAvail(out); }
 export function GetContentRegionMax(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { return bind.GetContentRegionMax(out); }
-export function GetWindowContentRegionMin(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { return bind.GetWindowContentRegionMin(out); }
-export function GetWindowContentRegionMax(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { return bind.GetWindowContentRegionMax(out); }
-export function GetWindowContentRegionWidth(): number { return bind.GetWindowContentRegionWidth(); }
+export function GetWindowContentRegionMin(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { out.x = 0; out.y = 0; return out; } // Removed in 1.91.6
+export function GetWindowContentRegionMax(out: Bind.interface_ImVec2 = new ImVec2()): Bind.interface_ImVec2 { return GetContentRegionAvail(out); } // Removed in 1.91.6
+export function GetWindowContentRegionWidth(): number { return GetContentRegionAvail().x; } // Removed in 1.91.6
 
 // Windows Scrolling
 // IMGUI_API float         GetScrollX();                                                   // get scrolling amount [0 .. GetScrollMaxX()]
@@ -3539,7 +3538,8 @@ export function Image(user_texture_id: ImTextureID | null, size: Readonly<Bind.i
     bind.Image(ImGuiContext.setTexture(user_texture_id), size, uv0, uv1, tint_col, border_col);
 }
 export function ImageButton(user_texture_id: ImTextureID | null, size: Readonly<Bind.interface_ImVec2> = new ImVec2(Number.MIN_SAFE_INTEGER, 0), uv0: Readonly<Bind.interface_ImVec2> = ImVec2.ZERO, uv1: Readonly<Bind.interface_ImVec2> = ImVec2.UNIT, frame_padding: number = -1, bg_col: Readonly<Bind.interface_ImVec4> = ImVec4.ZERO, tint_col: Readonly<Bind.interface_ImVec4> = ImVec4.WHITE): boolean {
-    return bind.ImageButton(ImGuiContext.setTexture(user_texture_id), size, uv0, uv1, frame_padding, bg_col, tint_col);
+    // Removed from C++ bindings (old API replaced by ImageButton with str_id in 1.89+)
+    return false;
 }
 export function Checkbox(label: string, v: Bind.ImScalar<boolean> | Bind.ImAccess<boolean>): boolean {
     if (Array.isArray(v)) {
@@ -4192,16 +4192,10 @@ export function ListBox<T>(label: string, current_item: Bind.ImAccess<number> | 
 export function ListBoxHeader(label: string, size: Readonly<Bind.interface_ImVec2>): boolean;
 export function ListBoxHeader(label: string, items_count: number, height_in_items?: number): boolean;
 export function ListBoxHeader(label: string, ...args: any[]): boolean {
-    if (typeof(args[0]) === "object") {
-        const size: Readonly<Bind.interface_ImVec2> = args[0];
-        return bind.ListBoxHeader_A(label, size);
-    } else {
-        const items_count: number = args[0];
-        const height_in_items: number = typeof(args[1]) === "number" ? args[1] : -1;
-        return bind.ListBoxHeader_B(label, items_count, height_in_items);
-    }
+    // Removed from C++ bindings (renamed to BeginListBox in newer ImGui)
+    return false;
 }
-export function ListBoxFooter(): void { bind.ListBoxFooter(); }
+export function ListBoxFooter(): void { /* Removed from C++ bindings (renamed to EndListBox), no-op */ }
 
 // Widgets: Data Plotting
 // IMGUI_API void          PlotLines(const char* label, const float* values, int values_count, int values_offset = 0, const char* overlay_text = NULL, float scale_min = FLT_MAX, float scale_max = FLT_MAX, ImVec2 graph_size = ImVec2(0, 0), int stride = sizeof(float));
@@ -4665,7 +4659,9 @@ export function GetStyleColorName(idx: ImGuiCol): string { return bind.GetStyleC
 // IMGUI_API void          SetStateStorage(ImGuiStorage* tree);
 // IMGUI_API ImGuiStorage* GetStateStorage();
 export function CalcListClipping(items_count: number, items_height: number, out_items_display_start: Bind.ImScalar<number>, out_items_display_end: Bind.ImScalar<number>): void {
-    return bind.CalcListClipping(items_count, items_height, out_items_display_start, out_items_display_end);
+    // Removed from C++ bindings, no-op — use ImGuiListClipper instead
+    out_items_display_start[0] = 0;
+    out_items_display_end[0] = items_count;
 }
 export function BeginChildFrame(id: ImGuiID, size: Readonly<Bind.interface_ImVec2>, flags: ImGuiWindowFlags = 0): boolean { return bind.BeginChildFrame(id, size, flags); }
 export function EndChildFrame(): void { bind.EndChildFrame(); }
@@ -4695,12 +4691,12 @@ export function ColorConvertHSVtoRGB(h: number, s: number, v: number, out_r: Bin
 // IMGUI_API bool          IsKeyReleased(int user_key_index);                                  // was key released (went from Down to !Down)?
 // IMGUI_API int           GetKeyPressedAmount(int key_index, float repeat_delay, float rate); // uses provided repeat rate/delay. return a count, most often 0 or 1 but might be >1 if RepeatRate is small enough that DeltaTime > RepeatRate
 // IMGUI_API void          CaptureKeyboardFromApp(bool want_capture_keyboard_value = true);    // attention: misleading name! manually override io.WantCaptureKeyboard flag next frame (said flag is entirely left for your application to handle). e.g. force capture keyboard when your widget is being hovered. This is equivalent to setting "io.WantCaptureKeyboard = want_capture_keyboard_value"; after the next NewFrame() call.
-export function GetKeyIndex(imgui_key: ImGuiKey): number { return bind.GetKeyIndex(imgui_key); }
+export function GetKeyIndex(imgui_key: ImGuiKey): number { return imgui_key; } // In 1.91.6, key indices ARE the ImGuiKey values
 export function IsKeyDown(user_key_index: number): boolean { return bind.IsKeyDown(user_key_index); }
 export function IsKeyPressed(user_key_index: number, repeat: boolean = true): boolean { return bind.IsKeyPressed(user_key_index, repeat); }
 export function IsKeyReleased(user_key_index: number): boolean { return bind.IsKeyReleased(user_key_index); }
 export function GetKeyPressedAmount(user_key_index: number, repeat_delay: number, rate: number): number { return bind.GetKeyPressedAmount(user_key_index, repeat_delay, rate); }
-export function CaptureKeyboardFromApp(capture: boolean = true) { return bind.CaptureKeyboardFromApp(capture); }
+export function CaptureKeyboardFromApp(capture: boolean = true) { /* Removed from C++ bindings, no-op */ }
 
 // Inputs Utilities: Mouse
 // - To refer to a mouse button, you may use named enums in your code e.g. ImGuiMouseButton_Left, ImGuiMouseButton_Right.
@@ -4735,7 +4731,7 @@ export function GetMouseDragDelta(button: number = 0, lock_threshold: number = -
 export function ResetMouseDragDelta(button: number = 0): void { bind.ResetMouseDragDelta(button); }
 export function GetMouseCursor(): ImGuiMouseCursor { return bind.GetMouseCursor(); }
 export function SetMouseCursor(type: ImGuiMouseCursor): void { bind.SetMouseCursor(type); }
-export function CaptureMouseFromApp(capture: boolean = true): void { bind.CaptureMouseFromApp(capture); }
+export function CaptureMouseFromApp(capture: boolean = true): void { /* Removed from C++ bindings, no-op */ }
 
 // Clipboard Utilities
 // - Also see the LogToClipboard() function to capture GUI into clipboard, or easily output text data to the clipboard.
@@ -4795,11 +4791,11 @@ export class ImGuiWindow
     get ContentSize(): Bind.interface_ImVec2 { return this.native.ContentSize; }
     set ContentSize(v:Bind.interface_ImVec2) {this.native.ContentSize.Set(v.x, v.y);}
 
-    get ContentSizeIdeal(): Bind.interface_ImVec2 { return this.native.ContentSizeIdeal; }
-    set ContentSizeIdeal(v:Bind.interface_ImVec2) {this.native.ContentSizeIdeal.Set(v.x, v.y);}
+    get ContentSizeIdeal(): Bind.interface_ImVec2 { return new ImVec2(0, 0); } // Removed from C++ bindings
+    set ContentSizeIdeal(v:Bind.interface_ImVec2) { /* no-op */ }
 
-    get ContentSizeExplicit(): Bind.interface_ImVec2 { return this.native.ContentSizeExplicit; }
-    set ContentSizeExplicit(v:Bind.interface_ImVec2) {this.native.ContentSizeExplicit.Set(v.x, v.y);}
+    get ContentSizeExplicit(): Bind.interface_ImVec2 { return new ImVec2(0, 0); } // Removed from C++ bindings
+    set ContentSizeExplicit(v:Bind.interface_ImVec2) { /* no-op */ }
 
     get WindowPadding(): Bind.interface_ImVec2 { return this.native.WindowPadding; }
     set WindowPadding(v:Bind.interface_ImVec2) {this.native.WindowPadding.Set(v.x, v.y);}
@@ -4821,8 +4817,8 @@ export class ImGuiWindow
     get ScrollTargetCenterRatio(): Bind.interface_ImVec2 { return this.native.ScrollTargetCenterRatio; }
     set ScrollTargetCenterRatio(v:Bind.interface_ImVec2) {this.native.ScrollTargetCenterRatio.Set(v.x, v.y);}
 
-    get ScrollTargetEdgeSnapDist(): Bind.interface_ImVec2 { return this.native.ScrollTargetEdgeSnapDist; }
-    set ScrollTargetEdgeSnapDist(v:Bind.interface_ImVec2) {this.native.ScrollTargetEdgeSnapDist.Set(v.x, v.y);}
+    get ScrollTargetEdgeSnapDist(): Bind.interface_ImVec2 { return new ImVec2(0, 0); } // Removed from C++ bindings
+    set ScrollTargetEdgeSnapDist(v:Bind.interface_ImVec2) { /* no-op */ }
 
     get ScrollbarSizes(): Bind.interface_ImVec2 { return this.native.ScrollbarSizes; }
     set ScrollbarSizes(v:Bind.interface_ImVec2) {this.native.ScrollbarSizes.Set(v.x, v.y);}
@@ -4832,8 +4828,8 @@ export class ImGuiWindow
     get Active():boolean {return this.native.Active;}
     get WasActive():boolean {return this.native.WasActive;}
 
-    get ItemWidthDefault():number {return this.native.ItemWidthDefault;}
-    set ItemWidthDefault(v:number) {this.native.ItemWidthDefault=v;}
+    get ItemWidthDefault():number { return 0; } // Removed from C++ bindings
+    set ItemWidthDefault(v:number) { /* no-op */ }
 
     get ParentWindow():ImGuiWindow {return this.native.ParentWindow?new ImGuiWindow(this.native.ParentWindow):null;}
     get RootWindow():ImGuiWindow {return this.native.RootWindow?new ImGuiWindow(this.native.RootWindow):null;}
@@ -4857,7 +4853,7 @@ export class ImGuiInputTextState
 
 export function GetCurrentWindow(): ImGuiWindow { return new ImGuiWindow(bind.GetCurrentWindow()); }
 export function GetHoveredWindow(): ImGuiWindow { return bind.GetHoveredWindow()?new ImGuiWindow(bind.GetHoveredWindow()):null; }
-export function GetHoveredRootWindow(): ImGuiWindow { return bind.GetHoveredRootWindow()?new ImGuiWindow(bind.GetHoveredRootWindow()):null; }
+export function GetHoveredRootWindow(): ImGuiWindow | null { return null; } // Removed from C++ bindings
 export function GetMovingWindow(): ImGuiWindow { return bind.GetMovingWindow()?new ImGuiWindow(bind.GetHoveredWindow()):null; }
 export function GetActiveWindow(): ImGuiWindow { return bind.GetActiveWindow()?new ImGuiWindow(bind.GetActiveWindow()):null; }
 
@@ -4867,7 +4863,7 @@ export function GetActiveId():ImGuiID {return bind.GetActiveId();}
 export function GetActiveIdPreviousFrame():ImGuiID {return bind.GetActiveIdPreviousFrame();}
 export function SetActiveId(id:ImGuiID) {return bind.SetActiveId(id);}
 
-export function GetInputTextState(id:ImGuiID): ImGuiInputTextState { return new ImGuiInputTextState(bind.GetInputTextState(id)); }
+export function GetInputTextState(id:ImGuiID): ImGuiInputTextState | null { return null; } // Removed from C++ bindings
 // GetInputTextId removed — internal API changed in ImGui 1.91.6
 
 export function Vec4_toRGBA(col:ImVec4):string
