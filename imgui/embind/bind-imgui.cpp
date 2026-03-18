@@ -1794,6 +1794,13 @@ EMSCRIPTEN_BINDINGS(ImGuiIO) {
         }), emscripten::allow_raw_pointers())
         // inline void    ClearInputCharacters() { InputCharacters[0] = 0; }   // Clear the text input buffer manually
         CLASS_METHOD(ImGuiIO, ClearInputCharacters)
+        // New input API (1.87+)
+        .function("AddKeyEvent", FUNCTION(void, (ImGuiIO& that, int key, bool down), {
+            that.AddKeyEvent((ImGuiKey)key, down);
+        }))
+        .function("AddKeyAnalogEvent", FUNCTION(void, (ImGuiIO& that, int key, bool down, float v), {
+            that.AddKeyAnalogEvent((ImGuiKey)key, down, v);
+        }))
 
         //------------------------------------------------------------------
         // Output - Retrieve after calling NewFrame()

@@ -510,29 +510,41 @@ export enum ImGuiSortDirection {
 // User fill ImGuiIO.KeyMap[] array with indices into the ImGuiIO.KeysDown[512] array
 export { ImGuiKey as Key };
 export enum ImGuiKey {
-    Tab,
-    LeftArrow,
-    RightArrow,
-    UpArrow,
-    DownArrow,
-    PageUp,
-    PageDown,
-    Home,
-    End,
-    Insert,
-    Delete,
-    Backspace,
-    Space,
-    Enter,
-    Escape,
-    KeyPadEnter,
-    A,         // for text edit CTRL+A: select all
-    C,         // for text edit CTRL+C: copy
-    V,         // for text edit CTRL+V: paste
-    X,         // for text edit CTRL+X: cut
-    Y,         // for text edit CTRL+Y: redo
-    Z,         // for text edit CTRL+Z: undo
-    COUNT,
+    None = 0,
+    Tab = 512,
+    LeftArrow = 513,
+    RightArrow = 514,
+    UpArrow = 515,
+    DownArrow = 516,
+    PageUp = 517,
+    PageDown = 518,
+    Home = 519,
+    End = 520,
+    Insert = 521,
+    Delete = 522,
+    Backspace = 523,
+    Space = 524,
+    Enter = 525,
+    Escape = 526,
+    LeftCtrl = 527, LeftShift = 528, LeftAlt = 529, LeftSuper = 530,
+    RightCtrl = 531, RightShift = 532, RightAlt = 533, RightSuper = 534,
+    Menu = 535,
+    _0 = 536, _1 = 537, _2 = 538, _3 = 539, _4 = 540, _5 = 541, _6 = 542, _7 = 543, _8 = 544, _9 = 545,
+    A = 546, B = 547, C = 548, D = 549, E = 550, F = 551, G = 552, H = 553, I = 554, J = 555,
+    K = 556, L = 557, M = 558, N = 559, O = 560, P = 561, Q = 562, R = 563, S = 564, T = 565,
+    U = 566, V = 567, W = 568, X = 569, Y = 570, Z = 571,
+    F1 = 572, F2 = 573, F3 = 574, F4 = 575, F5 = 576, F6 = 577,
+    F7 = 578, F8 = 579, F9 = 580, F10 = 581, F11 = 582, F12 = 583,
+    Apostrophe = 584, Comma = 585, Minus = 586, Period = 587, Slash = 588,
+    Semicolon = 589, Equal = 590, LeftBracket = 591, Backslash = 592, RightBracket = 593,
+    GraveAccent = 594, CapsLock = 595, ScrollLock = 596, NumLock = 597, PrintScreen = 598, Pause = 599,
+    Keypad0 = 600, Keypad1 = 601, Keypad2 = 602, Keypad3 = 603, Keypad4 = 604,
+    Keypad5 = 605, Keypad6 = 606, Keypad7 = 607, Keypad8 = 608, Keypad9 = 609,
+    KeypadDecimal = 610, KeypadDivide = 611, KeypadMultiply = 612, KeypadSubtract = 613,
+    KeypadAdd = 614, KeypadEnter = 615, KeypadEqual = 616,
+    // Legacy aliases
+    KeyPadEnter = 615,
+    COUNT = 666,
 }
 
 // To test io.KeyMods (which is a combination of individual fields io.KeyCtrl, io.KeyShift, io.KeyAlt set by user/backend)
@@ -2969,6 +2981,8 @@ export class ImGuiIO
 
     // Functions
     // IMGUI_API void AddInputCharacter(ImWchar c);                        // Add new character into InputCharacters[]
+    public AddKeyEvent(key: number, down: boolean): void { this.native.AddKeyEvent(key, down); }
+    public AddKeyAnalogEvent(key: number, down: boolean, v: number): void { this.native.AddKeyAnalogEvent(key, down, v); }
     public AddInputCharacter(c: number): void { this.native.AddInputCharacter(c); }
     // IMGUI_API void  AddInputCharacterUTF16(ImWchar16 c);        // Queue new character input from an UTF-16 character, it can be a surrogate
     public AddInputCharacterUTF16(c: number): void { this.native.AddInputCharacterUTF16(c); }
