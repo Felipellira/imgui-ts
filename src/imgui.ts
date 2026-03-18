@@ -593,6 +593,9 @@ export enum ImGuiConfigFlags
     NoMouse              = 1 << 4,   // Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information back-end
     NoMouseCursorChange  = 1 << 5,   // Instruct back-end to not alter mouse cursor shape and visibility.
 
+    DockingEnable        = 1 << 6,   // Docking enable flags. Use with io.ConfigFlags.
+    ViewportsEnable      = 1 << 10,  // Viewports enable flags.
+
     IsSRGB               = 1 << 20,  // Application is SRGB-aware.
     IsTouchScreen        = 1 << 21   // Application is using a touch screen instead of a mouse.
 }
@@ -4938,16 +4941,20 @@ export function Vec4_toRGBA(col:ImVec4):string
 {
     return "rgba("+col.x*255+","+col.y*255+","+col.z*255+","+col.w*255+")";
 }
-export function Font_toString(font:ImFont):string
-{
-    return font.FontStyle + " " + font.FontSize + "px " + font.FontName;
+// ── Docking ──
+
+export function DockSpace(id: ImGuiID, size: Readonly<Bind.interface_ImVec2> = ImVec2.ZERO, flags: number = 0): ImGuiID {
+    return bind.DockSpace(id, size, flags);
 }
-export function CreateFont(name:string, size:number, style?:string):ImFont
-{
-    const io=GetIO();
-    let font =io.Fonts.AddFontDefault();
-    font.FontStyle=style;
-    font.FontName=name;
-    font.FontSize=size;
-    return font;
+export function DockSpaceOverViewport(): ImGuiID {
+    return bind.DockSpaceOverViewport();
+}
+export function SetNextWindowDockID(dock_id: ImGuiID, cond: ImGuiCond = 0): void {
+    bind.SetNextWindowDockID(dock_id, cond);
+}
+export function GetWindowDockID(): ImGuiID {
+    return bind.GetWindowDockID();
+}
+export function IsWindowDocked(): boolean {
+    return bind.IsWindowDocked();
 }

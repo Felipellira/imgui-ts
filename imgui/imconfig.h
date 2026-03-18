@@ -109,7 +109,6 @@ namespace ImGui
 */
 #define HAVE_IMGUI_DEMO
 #define IMGUI_INCLUDE_IMGUI_USER_H
-#define USE_EXTERNAL_FONT
 
 #define ImDrawIdx unsigned int
 #define IMGUI_USE_WCHAR32

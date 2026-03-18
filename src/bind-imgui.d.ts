@@ -2197,4 +2197,11 @@ export interface Module extends Emscripten.EmscriptenModule {
     ): void;
     ImGuizmo_PushID(id: number): void;
     ImGuizmo_PopID(): void;
+
+    // Docking
+    DockSpace(id: number, size: interface_ImVec2, flags: number): number;
+    DockSpaceOverViewport(): number;
+    SetNextWindowDockID(dock_id: number, cond: number): void;
+    GetWindowDockID(): number;
+    IsWindowDocked(): boolean;
 }
