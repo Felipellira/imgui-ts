@@ -872,9 +872,6 @@ export function RenderDrawData(draw_data: ImGui.DrawData | null = ImGui.GetDrawD
                 if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0 && clip_rect.w >= 0.0) {
                     // Apply scissor/clipping rectangle
                     gl && gl.scissor(clip_rect.x, fb_height - clip_rect.w, clip_rect.z - clip_rect.x, clip_rect.w - clip_rect.y);
-                    gl && gl.blendFunc(BlendFactor(draw_cmd.Blend.src, true), BlendFactor(draw_cmd.Blend.dst, false));
-
-                    gl.ONE
                     // Bind texture, Draw
                     gl && gl.activeTexture(gl.TEXTURE0);
                     gl && gl.bindTexture(gl.TEXTURE_2D, draw_cmd.TextureId);
