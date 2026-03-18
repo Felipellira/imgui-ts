@@ -4887,8 +4887,8 @@ export const ImGuiDockNodeFlags = {
 } as const;
 export { ImGuiDockNodeFlags as DockNodeFlags };
 
-export function DockSpaceOverViewport(flags: number = 0): ImGuiID {
-    return bind.DockSpaceOverViewport(flags);
+export function DockSpaceOverViewport(flags: number = 0, dockspace_id: ImGuiID = 0): ImGuiID {
+    return bind.DockSpaceOverViewport(dockspace_id, flags);
 }
 export function SetNextWindowDockID(dock_id: ImGuiID, cond: ImGuiCond = 0): void {
     bind.SetNextWindowDockID(dock_id, cond);

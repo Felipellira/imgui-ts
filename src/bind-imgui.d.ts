@@ -2200,7 +2200,7 @@ export interface Module extends Emscripten.EmscriptenModule {
 
     // Docking
     DockSpace(id: number, size: interface_ImVec2, flags: number): number;
-    DockSpaceOverViewport(flags: number): number;
+    DockSpaceOverViewport(dockspace_id: number, flags: number): number;
     SetNextWindowDockID(dock_id: number, cond: number): void;
     GetWindowDockID(): number;
     IsWindowDocked(): boolean;

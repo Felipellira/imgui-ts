@@ -3322,8 +3322,8 @@ EMSCRIPTEN_BINDINGS(ImGui) {
         ImVec2 _size = size.isNull() ? ImVec2(0, 0) : import_ImVec2(size);
         return ImGui::DockSpace(id, _size, (ImGuiDockNodeFlags)flags);
     }));
-    emscripten::function("DockSpaceOverViewport", FUNCTION(ImGuiID, (int flags), {
-        return ImGui::DockSpaceOverViewport((ImGuiDockNodeFlags)flags);
+    emscripten::function("DockSpaceOverViewport", FUNCTION(ImGuiID, (ImGuiID dockspace_id, int flags), {
+        return ImGui::DockSpaceOverViewport(dockspace_id, NULL, (ImGuiDockNodeFlags)flags);
     }));
     emscripten::function("SetNextWindowDockID", FUNCTION(void, (ImGuiID dock_id, int cond), {
         ImGui::SetNextWindowDockID(dock_id, (ImGuiCond)cond);
