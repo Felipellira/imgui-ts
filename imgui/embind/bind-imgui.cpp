@@ -3538,17 +3538,14 @@ EMSCRIPTEN_BINDINGS(ImGuizmo) {
     emscripten::function("ImGuizmo_Manipulate", FUNCTION(bool, (
         emscripten::val view_val,
         emscripten::val proj_val,
-        ImGuizmo::OPERATION op,
-        ImGuizmo::MODE mode,
+        int op,
+        int mode,
         emscripten::val matrix_val,
         emscripten::val delta_val,
         emscripten::val snap_val
     ), {
-        // View matrix (16 floats, read-only)
         std::vector<float> view_vec = emscripten::vecFromJSArray<float>(view_val);
-        // Projection matrix (16 floats, read-only)
         std::vector<float> proj_vec = emscripten::vecFromJSArray<float>(proj_val);
-        // Object matrix (16 floats, read-write)
         std::vector<float> matrix_vec = emscripten::vecFromJSArray<float>(matrix_val);
 
         float* snap_ptr = nullptr;
@@ -3561,7 +3558,8 @@ EMSCRIPTEN_BINDINGS(ImGuizmo) {
         float delta[16];
         bool result = ImGuizmo::Manipulate(
             view_vec.data(), proj_vec.data(),
-            op, mode,
+            static_cast<ImGuizmo::OPERATION>(op),
+            static_cast<ImGuizmo::MODE>(mode),
             matrix_vec.data(),
             delta,
             snap_ptr
